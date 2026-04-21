@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이고 게임즈 — Indie Game Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #080808;
+  --surface: #0f0f0f;
+  --surface2: #161616;
+  --border: #1e1e1e;
+  --accent: #c8f53e;
+  --accent2: #ff4d6d;
+  --text: #e8e8e0;
+  --text-dim: #5a5a52;
+  --text-mid: #9a9a8e;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-serif: 'DM Serif Display', serif;
+  --font-mono: 'DM Mono', monospace;
+  --font-body: 'Noto Sans KR', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 300;
+  min-height: 100vh;
+  cursor: none;
+  overflow-x: hidden;
+}
+
+/* ── Custom Cursor ── */
+.cursor {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+  mix-blend-mode: exclusion;
+}
+.cursor-ring {
+  position: fixed;
+  width: 32px; height: 32px;
+  border: 1px solid rgba(200,245,62,0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease-out, width 0.25s, height 0.25s;
+}
+body:hover .cursor { opacity: 1; }
+
+/* ── Noise Overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9990;
+  opacity: 0.5;
+}
+
+/* ── Navigation ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 48px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(8,8,8,0.8);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 4px;
+  color: var(--text);
+  text-decoration: none;
+  position: relative;
+}
+.nav-logo span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  text-decoration: none;
+  transition: color 0.2s;
+  cursor: none;
+}
+.nav-links a:hover { color: var(--accent); }
+
+.nav-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  padding: 10px 24px;
+  cursor: none;
+  transition: background 0.2s, transform 0.1s;
+}
+.nav-btn:hover { background: #d8ff4e; transform: translateY(-1px); }
+.nav-btn.outline {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.nav-btn.outline:hover { background: rgba(200,245,62,0.08); }
+
+/* ── Hero ── */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 120px 48px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(200,245,62,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,245,62,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridShift 20s linear infinite;
+}
+@keyframes gridShift {
+  from { background-position: 0 0; }
+  to { background-position: 60px 60px; }
+}
+
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(200,245,62,0.06) 0%, transparent 70%);
+  top: 10%; left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.2s;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 12vw, 160px);
+  line-height: 0.9;
+  letter-spacing: -2px;
+  color: var(--text);
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.4s;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--accent);
+  font-family: var(--font-serif);
+}
+
+.hero-sub {
+  max-width: 480px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-mid);
+  margin-top: 32px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.6s;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  margin-top: 48px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.8s;
+}
+
+.btn-primary {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  padding: 16px 40px;
+  cursor: none;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200,245,62,0.3); }
+
+.btn-ghost {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 16px 40px;
+  cursor: none;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-ghost:hover { border-color: var(--text-mid); color: var(--text); }
+
+.hero-scroll {
+  position: absolute;
+  right: 48px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 1s;
+}
+.scroll-line {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--accent));
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+.scroll-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Section Base ── */
+section {
+  padding: 120px 48px;
+  position: relative;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 6vw, 80px);
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--text);
+  margin-bottom: 64px;
+}
+
+/* ── Games Section ── */
+#games { background: var(--surface); }
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2px;
+}
+
+.game-card {
+  position: relative;
+  background: var(--bg);
+  overflow: hidden;
+  group: true;
+  cursor: none;
+}
+
+.game-card-inner {
+  padding: 40px;
+  transition: transform 0.3s;
+}
+.game-card:hover .game-card-inner { transform: translateY(-4px); }
+
+.game-card-accent {
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 0;
+  background: var(--accent);
+  transition: height 0.3s;
+}
+.game-card:hover .game-card-accent { height: 100%; }
+
+.game-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.game-title {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.game-desc {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-mid);
+  margin-bottom: 32px;
+}
+
+.game-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s, gap 0.2s;
+  cursor: none;
+}
+.game-link:hover { color: var(--accent); gap: 12px; }
+.game-link::after { content: '→'; }
+
+.no-games {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 40px;
+  border: 1px dashed var(--border);
+}
+.no-games p {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+/* ── Team Section ── */
+#team {
+  background: var(--bg);
+}
+
+.team-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  padding: 80px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.team-placeholder::before {
+  content: 'COMING SOON';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  font-family: var(--font-display);
+  font-size: 120px;
+  color: rgba(255,255,255,0.02);
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: 8px;
+}
+.team-info h3 {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.team-info p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-mid);
+  max-width: 560px;
+}
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 4px;
+  color: var(--text-dim);
+}
+.footer-logo span { color: var(--accent); }
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* ── Modal Base ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 480px;
+  padding: 56px;
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s;
+}
+.modal-overlay.active .modal { transform: translateY(0); }
+
+.modal-close {
+  position: absolute;
+  top: 24px; right: 24px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  cursor: none;
+  transition: color 0.2s;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--text); }
+
+.modal-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.modal-title {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  color: var(--text);
+  margin-bottom: 40px;
+  line-height: 1.1;
+}
+
+/* ── Form ── */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: 10px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 14px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: none;
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text-dim); }
+.form-input:focus, .form-textarea:focus { border-color: var(--accent); }
+.form-textarea { min-height: 120px; line-height: 1.6; }
+
+.form-error {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent2);
+  margin-top: 12px;
+  display: none;
+}
+
+.form-submit {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  padding: 18px;
+  cursor: none;
+  margin-top: 8px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.form-submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+}
+.form-submit:hover::after { transform: translateX(0); }
+.form-submit:hover { transform: translateY(-1px); }
+
+/* ── Admin Register Modal ── */
+.register-modal { max-width: 600px; }
+.register-modal .modal { max-width: 600px; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 9000;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.toast.error {
+  background: var(--accent2);
+  color: #fff;
+}
+
+/* ── Admin Badge ── */
+.admin-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent);
+  padding: 4px 10px;
+  display: none;
+}
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 48px;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  nav { padding: 20px 24px; }
+  .nav-links { display: none; }
+  section { padding: 80px 24px; }
+  #hero { padding: 0 24px 60px; }
+  .hero-title { font-size: 64px; }
+  footer { flex-direction: column; gap: 16px; text-align: center; }
+  .modal { padding: 40px 28px; margin: 20px; }
+  .team-placeholder { flex-direction: column; padding: 48px 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ── Navigation ── -->
+<nav>
+  <a href="#" class="nav-logo">이고<span>게임즈</span></a>
+  <ul class="nav-links">
+    <li><a href="#games">게임</a></li>
+    <li><a href="#team">팀 소개</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span class="admin-badge" id="adminBadge">관리자</span>
+    <button class="nav-btn outline" id="adminRegisterBtn" style="display:none;" onclick="openRegisterModal()">+ 게임 등록</button>
+    <button class="nav-btn" id="loginBtn" onclick="openLoginModal()">로그인</button>
+    <button class="nav-btn outline" id="logoutBtn" style="display:none;" onclick="logout()">로그아웃</button>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+
+  <p class="hero-eyebrow">// 이세계 고삼즈 게임 스튜디오</p>
+  <h1 class="hero-title">
+    고3들이<br>
+    시작한<br>
+    <em>끝나지 않을</em><br>
+    이야기
+  </h1>
+  <p class="hero-sub">수능보다 스토리가 먼저인 고3들이 만드는 인디 게임 스튜디오.<br>우리가 쓰는 세계에서 당신의 이야기가 시작됩니다.</p>
+  <div class="hero-cta">
+    <a href="#games" class="btn-primary">게임 보기</a>
+    <a href="#team" class="btn-ghost">팀 소개</a>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span class="scroll-label">스크롤</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Games ── -->
+<section id="games">
+  <p class="section-label">// 001 — 우리의 게임</p>
+  <h2 class="section-title">게임</h2>
+  <div class="games-grid" id="gamesGrid">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Team ── -->
+<section id="team">
+  <p class="section-label">// 002 — 우리 팀</p>
+  <h2 class="section-title">팀 소개</h2>
+  <div class="team-placeholder">
+    <div class="team-info">
+      <h3>이세계 고삼즈</h3>
+      <p>저희는 모두 고등학교 3학년 학생들입니다. 입시와 게임 개발을 동시에 하는 진짜 이세계 생활 중이에요. 팀 소개 페이지는 곧 공개됩니다.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Footer ── -->
+<footer>
+  <span class="footer-logo">이고<span>게임즈</span></span>
+  <span class="footer-copy">© 2025 이고 게임즈. All rights reserved.</span>
+</footer>
+
+<!-- ── Login Modal ── -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    <p class="modal-label">// 접속</p>
+    <h2 class="modal-title">로그인</h2>
+    <div class="form-group">
+      <label class="form-label">아이디</label>
+      <input type="text" class="form-input" id="loginUsername" placeholder="아이디" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label">비밀번호</label>
+      <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
+    </div>
+    <p class="form-error" id="loginError">아이디 또는 비밀번호가 올바르지 않습니다.</p>
+    <button class="form-submit" onclick="handleLogin()">로그인 →</button>
+  </div>
+</div>
+
+<!-- ── Register Game Modal ── -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal" style="max-width:600px;">
+    <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
+    <p class="modal-label">// Admin — New Entry</p>
+    <h2 class="modal-title">게임 등록</h2>
+    <div class="form-group">
+      <label class="form-label">게임 이름</label>
+      <input type="text" class="form-input" id="regTitle" placeholder="게임 제목을 입력하세요">
+    </div>
+    <div class="form-group">
+      <label class="form-label">장르 / 태그</label>
+      <input type="text" class="form-input" id="regTag" placeholder="예: RPG, Puzzle, Horror">
+    </div>
+    <div class="form-group">
+      <label class="form-label">게임 사이트 URL</label>
+      <input type="text" class="form-input" id="regUrl" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">소개 글</label>
+      <textarea class="form-textarea" id="regDesc" placeholder="게임에 대한 소개 글을 입력하세요..." style="min-height:140px;"></textarea>
+    </div>
+    <button class="form-submit" onclick="handleRegister()">등록하기 →</button>
+  </div>
+</div>
+
+<script>
+/* ─── Config ─── */
+// 아이디와 비밀번호 모두 SHA-256 해시값으로 저장됩니다
+const ADMIN_ACCOUNTS = [
+  {
+    usernameHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
+    passwordHash: '8061e01bda980a459f3f5d1fc5a8a6717922671beb870aa4c0372f902215e639',
+    isAdmin: true
+  },
+  {
+    usernameHash: '55343a39f0e9dc6bbb787c7e4293cb4634046bd2973912b52e0a6e8ddbe5f743',
+    passwordHash: '8061e01bda980a459f3f5d1fc5a8a6717922671beb870aa4c0372f902215e639',
+    isAdmin: true
+  }
+];
+
+async function hashPassword(pw) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* ─── JSONBin 설정 ─── */
+const BIN_ID = '69e6cc7636566621a8d4d358';
+const MASTER_KEY = '$2a$10$FyJTKi1GTdWNcuV5i/GWVuwYnwllGE/gJ7d2B.FNVguXreN6c9kOm';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+async function fetchGames() {
+  const res = await fetch(BIN_URL + '/latest', {
+    headers: { 'X-Master-Key': MASTER_KEY }
+  });
+  const data = await res.json();
+  return data.record.games || [];
+}
+
+async function saveGames(gamesArr) {
+  await fetch(BIN_URL, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': MASTER_KEY
+    },
+    body: JSON.stringify({ games: gamesArr })
+  });
+}
+
+/* ─── State ─── */
+let currentUser = null;
+let games = [];
+
+/* ─── Init ─── */
+(async () => {
+  const grid = document.getElementById('gamesGrid');
+  grid.innerHTML = `<div class="no-games"><p>// 게임 목록 불러오는 중...</p></div>`;
+  try {
+    games = await fetchGames();
+  } catch(e) {
+    games = [];
+  }
+  renderGames();
+})();
+
+/* ─── Cursor ─── */
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  cursorRing.style.left = rx + 'px';
+  cursorRing.style.top = ry + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button, .game-card, .form-input, .form-textarea').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '16px';
+    cursor.style.height = '16px';
+    cursorRing.style.width = '48px';
+    cursorRing.style.height = '48px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '8px';
+    cursor.style.height = '8px';
+    cursorRing.style.width = '32px';
+    cursorRing.style.height = '32px';
+  });
+});
+
+/* ─── Toast ─── */
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ─── Modal ─── */
+function openLoginModal() {
+  document.getElementById('loginUsername').value = '';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('loginModal').classList.add('active');
+}
+function openRegisterModal() {
+  document.getElementById('regTitle').value = '';
+  document.getElementById('regTag').value = '';
+  document.getElementById('regUrl').value = '';
+  document.getElementById('regDesc').value = '';
+  document.getElementById('registerModal').classList.add('active');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// ESC key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+  }
+});
+// Click outside
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
+
+/* ─── Login ─── */
+async function handleLogin() {
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value;
+  const hashedU = await hashPassword(u);
+  const hashedP = await hashPassword(p);
+  const found = ADMIN_ACCOUNTS.find(a => a.usernameHash === hashedU && a.passwordHash === hashedP);
+
+  if (!found) {
+    document.getElementById('loginError').style.display = 'block';
+    return;
+  }
+  currentUser = found;
+  closeModal('loginModal');
+  updateNav();
+  showToast('로그인 되었습니다 ✓');
+}
+
+// Enter key on login
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+/* ─── Logout ─── */
+function logout() {
+  currentUser = null;
+  updateNav();
+  showToast('로그아웃 되었습니다');
+}
+
+/* ─── Nav Update ─── */
+function updateNav() {
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const adminBadge = document.getElementById('adminBadge');
+  const adminRegisterBtn = document.getElementById('adminRegisterBtn');
+
+  if (currentUser) {
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'block';
+    if (currentUser.isAdmin) {
+      adminBadge.style.display = 'inline-block';
+      adminRegisterBtn.style.display = 'block';
+    }
+  } else {
+    loginBtn.style.display = 'block';
+    logoutBtn.style.display = 'none';
+    adminBadge.style.display = 'none';
+    adminRegisterBtn.style.display = 'none';
+  }
+}
+
+/* ─── Register Game ─── */
+async function handleRegister() {
+  const title = document.getElementById('regTitle').value.trim();
+  const tag   = document.getElementById('regTag').value.trim();
+  const url   = document.getElementById('regUrl').value.trim();
+  const desc  = document.getElementById('regDesc').value.trim();
+
+  if (!title || !desc) {
+    showToast('게임 이름과 소개 글은 필수입니다', true);
+    return;
+  }
+
+  const game = {
+    id: Date.now(),
+    title,
+    tag: tag || 'Indie Game',
+    url,
+    desc
+  };
+
+  const btn = document.querySelector('#registerModal .form-submit');
+  btn.textContent = '등록 중...';
+  btn.disabled = true;
+
+  try {
+    games.push(game);
+    await saveGames(games);
+    closeModal('registerModal');
+    renderGames();
+    showToast('게임이 등록되었습니다 ✓');
+  } catch(e) {
+    games.pop();
+    showToast('등록 실패. 다시 시도해주세요.', true);
+  } finally {
+    btn.textContent = '등록하기 →';
+    btn.disabled = false;
+  }
+}
+
+/* ─── Render Games ─── */
+function renderGames() {
+  const grid = document.getElementById('gamesGrid');
+  if (games.length === 0) {
+    grid.innerHTML = `
+      <div class="no-games">
+        <p>// 아직 등록된 게임이 없습니다</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = games.map((g, i) => `
+    <div class="game-card" style="animation: fadeUp 0.5s ease both ${i * 0.1}s">
+      <div class="game-card-accent"></div>
+      <div class="game-card-inner">
+        <p class="game-tag">${escHtml(g.tag)}</p>
+        <h3 class="game-title">${escHtml(g.title)}</h3>
+        <p class="game-desc">${escHtml(g.desc)}</p>
+        ${g.url ? `<a href="${escHtml(g.url)}" target="_blank" class="game-link">게임 바로가기</a>` : ''}
+        ${currentUser && currentUser.isAdmin ? `<button onclick="deleteGame(${g.id})" style="background:none;border:none;color:var(--text-dim);font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:none;margin-top:20px;padding:0;transition:color 0.2s;" onmouseenter="this.style.color='var(--accent2)'" onmouseleave="this.style.color='var(--text-dim)'">삭제</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function deleteGame(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  const prev = [...games];
+  games = games.filter(g => g.id !== id);
+  try {
+    await saveGames(games);
+    renderGames();
+    showToast('삭제되었습니다');
+  } catch(e) {
+    games = prev;
+    showToast('삭제 실패. 다시 시도해주세요.', true);
+  }
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
