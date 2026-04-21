@@ -702,7 +702,6 @@ footer {
 
 <!-- ── Games ── -->
 <section id="games">
-  <p class="section-label">// 001 — 우리의 게임</p>
   <h2 class="section-title">게임</h2>
   <div class="games-grid" id="gamesGrid">
     <!-- Populated by JS -->
@@ -713,7 +712,6 @@ footer {
 
 <!-- ── Team ── -->
 <section id="team">
-  <p class="section-label">// 002 — 우리 팀</p>
   <h2 class="section-title">팀 소개</h2>
   <div class="team-placeholder">
     <div class="team-info">
@@ -735,7 +733,6 @@ footer {
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
-    <p class="modal-label">// 접속</p>
     <h2 class="modal-title">로그인</h2>
     <div class="form-group">
       <label class="form-label">아이디</label>
@@ -754,7 +751,6 @@ footer {
 <div class="modal-overlay" id="registerModal">
   <div class="modal" style="max-width:600px;">
     <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
-    <p class="modal-label">// Admin — New Entry</p>
     <h2 class="modal-title">게임 등록</h2>
     <div class="form-group">
       <label class="form-label">게임 이름</label>
@@ -778,7 +774,6 @@ footer {
 
 <script>
 /* ─── Config ─── */
-// 아이디와 비밀번호 모두 SHA-256 해시값으로 저장됩니다
 const ADMIN_ACCOUNTS = [
   {
     usernameHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
@@ -828,7 +823,7 @@ let games = [];
 /* ─── Init ─── */
 (async () => {
   const grid = document.getElementById('gamesGrid');
-  grid.innerHTML = `<div class="no-games"><p>// 게임 목록 불러오는 중...</p></div>`;
+  grid.innerHTML = `<div class="no-games"><p>게임 목록 불러오는 중...</p></div>`;
   try {
     games = await fetchGames();
   } catch(e) {
@@ -1009,7 +1004,7 @@ function renderGames() {
   if (games.length === 0) {
     grid.innerHTML = `
       <div class="no-games">
-        <p>// 아직 등록된 게임이 없습니다</p>
+        <p>아직 등록된 게임이 없습니다</p>
       </div>`;
     return;
   }
